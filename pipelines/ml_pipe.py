@@ -11,14 +11,14 @@ def main():
     # x = sm.add_constant(train_data)
     # mdl = model.get_robustcov_results(cov_type='HAC', maxlags=1)
     # predict the test data
-    # _, lr_metrics = lr_prediction()
-    # print("Linear Regression Metrics: \n", lr_metrics)
-    # _, ridge_metrics = ridge_prediction()
-    # print("Ridge Regression Metrics: \n", ridge_metrics)
-    # _, lasso_metrics = lasso_prediction()
-    # print("Lasso Regression Metrics: \n", lasso_metrics)
-    # _, elastinet_metrics = elastinet_prediction()
-    # print("Elastinet Regression Metrics: \n", elastinet_metrics)
+    _, lr_metrics = lr_prediction()
+    print("Linear Regression Metrics: \n", lr_metrics)
+    _, ridge_metrics = ridge_prediction()
+    print("Ridge Regression Metrics: \n", ridge_metrics)
+    _, lasso_metrics = lasso_prediction()
+    print("Lasso Regression Metrics: \n", lasso_metrics)
+    _, elastinet_metrics = elastinet_prediction()
+    print("Elastinet Regression Metrics: \n", elastinet_metrics)
     _, deeplr_metrics = deeplearning_prediction()
     print("Deep Learning Regression Metrics: \n", deeplr_metrics)
 
@@ -141,6 +141,8 @@ def deeplearning_prediction():
 
     model = KerasRegressor(model=baseline_model, epochs=100, batch_size=5, verbose=0)
     scoring = ('r2', 'neg_mean_squared_error')
+    model = model.fit(train_data, y_train)
+
     cv_results = cross_validate(model,
                                 train_data,
                                 y_train,
@@ -149,6 +151,7 @@ def deeplearning_prediction():
                                 return_train_score=True)
     model_metrics = {metric: sorted(cv_results['test_'+metric], reverse=True)[0]
                      for metric in scoring}
+
     y_pred_array = model.predict(test_data)
     input_dict = {"Id": test_data['Id'].to_numpy(), 'SalePrice': y_pred_array.flatten()}
     y_pred_df = pd.DataFrame(input_dict)
